@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yupi.usercenter.mapper.CoursesMapper">
+
+    <resultMap id="BaseResultMap" type="com.yupi.usercenter.model.domain.Courses">
+            <id property="course_id" column="course_id" jdbcType="INTEGER"/>
+            <result property="course_name" column="course_name" jdbcType="VARCHAR"/>
+            <result property="credits" column="credits" jdbcType="INTEGER"/>
+            <result property="term" column="term" jdbcType="VARCHAR"/>
+            <result property="create_time" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="update_time" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        course_id,course_name,credits,
+        term,create_time,update_time
+    </sql>
+</mapper>

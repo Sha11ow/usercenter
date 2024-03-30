@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: user-center
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/yupi
+    username: root
+    password: Sha11owdream
+##驼峰命名法
+#mybatis:
+#  configuration:
+#    map-underscore-to-camel-case: true
+  #一天过期
+  session:
+    timeout: 86400
+
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
