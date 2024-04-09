@@ -1,55 +1,63 @@
 # 用户管理项目
 
-### 星球使用指南
-
-- 星球里的项目有问题直接开搜，一般能搜到一个对应答疑文档，小伙伴的答疑一般都有解答，让人不禁感慨大星球的好处。
-- 鱼皮的项目是有仓库的，不会写就去拉
-
 ### 前端
 
-- 说实话并不会前端，配环境真的很费力气，坑还多，以后有时间再补吧
-- 直接拉的鱼皮仓库代码
-
 ### 后端
-
-day1：
 
 - 用idea来初始化spring项目
 - 官方已经不支持Java8，可以换源为aliyun.start.com（原来的为spring.start.io）
 - 依赖项可以在初始化处先添加一部分
-
-day2：
 
 - yml文件一定注意空行格式
 - 缺的依赖去[mvnrepository.com]()官网去搜
 - datasource的url后面要加数据库名
 - 多去看官方文档
 
-day3：
 
 数据表的设计
+- id都为4位char， 创建的时候使用4位数字
+- 密码都为6位char，创建的时候使用6位数字
+- 密码可以选择md5加密后存储，登录的时候重新加密比对
+- 表已经符合第三范式，添加属性注意不破坏第三范式
+  
+**管理员表(administer)：**
 
-**管理员字段：**
+- 属性：`admin_id`（管理员ID），`password`（密码），`createTime`（创建时间），`updateTime`（更新时间）
+- admin_id: char(4)
+- password: char(6)
+-primary key: admin_id
 
-- 属性：`admin_id`（管理员ID），`username`（用户名），`password`（密码），`name`（姓名），`contact`（联系方式），createTime（创建时间），updateTime（更新时间）
+**教师表(teacher)：**
 
-**教师字段：**
+- 属性：`teacher_id`（教师ID），`name`（姓名），`password` （密码），`createTime`（创建时间），`updateTime`（更新时间）
+- teacher_id: char(4)
+- name: char(4)
+- password: char(6)
+- primary key: teacher_id
 
-- 属性：`teacher_id`（教师ID），`name`（姓名），`title`（职称），`department`（所在部门），`contact_info`（联系方式），createTime（创建时间），updateTime（更新时间）
+**学生表(student)：**
 
-**学生字段：**
+- 属性：`student_id`（学号），`name`（姓名），`password` （密码），`createTime`（创建时间），`updateTime`（更新时间）
+- student_id: char(4)
+- name: char(4)
+- password: char(6)
+- primary key: student_id
 
-- 属性：`student_id`（学号），`name`（姓名），`gender`（性别），`birth_date`（出生日期），`major`（专业），`hometown`（籍贯），`phone_number`（联系电话），`class_id`（班级编号），createTime（创建时间），updateTime（更新时间）
+**课程表(course)**：
 
-**班级：**
+- 属性：`course_id`（课程号），`course_name`（课程名称），`credit_hours`（学时），`credits`（学分），`semester`（学期），`createTime`（创建时间），`updateTime`（更新时间）
+- course_id: char(8)
+- course_name: char(8)
+- credit_hours: int
+- credits: int
+- semester: char(6)  (例如：202401)
+- primary key: (course_id, semester)
 
-- 属性：`class_id`（班级编号），`class_name`（班级名称），createTime（创建时间），updateTime（更新时间）
+**选课表(course_seleciton)**：
 
-**课程（Courses）**：
-
-- 属性：`course_id`（课程编号），`course_name`（课程名称），`credit_hours`（学时），`credits`（学分），`semester`（开设学期），createTime（创建时间），updateTime（更新时间）
-
-day4：
+- 属性：`student_id`（学号），`semester`（学期），`course_id`（课程号），`teacher_id`（学分），`score`（成绩），createTime（创建时间），updateTime（更新时间）
+- score: int
+- primary key: (student_id, semester, course_id, teacher_id)
 
 **mybatisx**：
 
@@ -57,21 +65,10 @@ day4：
 
 先总体设计，再理清逻辑再写代码，软件工程那一套
 
-### **注册逻辑设计：**
-
-- 用户在前端输入名字（name）和密码、以及校验码（todo）
-- 校验用户的名字（name）、密码、校验密码，是否符合要求 
-- 名字只能是汉字或者纯英文
-- 密码就 不小于 8 位吧
-- 密码和校验密码相同
-- 手机号码联系方式
-- 对密码进行加密（密码千万不要直接以明文存储到数据库中）
-- 如果上述都正确，生成一个8位纯数字的账号，随机且不重复。
-- 向数据库插入用户数据
-
-数据库字段修改：账号密码都改为字符串
-
-对着逻辑敲代码就比较简单了
+### **注册与登录逻辑设计：**
+- 账号注册由管理员注册
+- 登录时账号id为管理员id(admin_id)/教师id(teacher_id)/学生id(student_id)
+- 密码为6为纯数字id
 
 **虽说现在mybatis可以驼峰命名数据库了，但我诚恳建议还是下划线的来，减少bug**
 
@@ -89,23 +86,6 @@ day4：
 
 返回值：用户信息（ 脱敏 ）
 
-### 登录逻辑
-
-- 校验用户账户和密码是否合法 
-
-  账号是8位数字
-
-  密码就不小于 8 位
-
-- 校验账号和密码是否输入正确，密码要和数据库中的密文密码去对比，账号也是数据库的账号 
-
-- 用户信息脱敏，隐藏敏感信息，防止数据库中的字段泄露 
-
-- 我们要记录用户的登录态（session），将其存到服务器上（用后端 SpringBoot 框架封装的服务器 tomcat 去记录）
-  cookie 
-
-- 返回脱敏后的用户信息
-
 接口设计
 
 接受参数：用户账户、密码
@@ -118,18 +98,6 @@ day4：
 
 返回值：用户信息（ 脱敏 ）
 
-登录逻辑
-
-- 校验用户账户和密码是否合法 
-  非空
-  账户长度为8位数字
-  密码就不小于 8 位
-  账户不包含特殊字符
-  校验密码是否输入正确，要和数据库中的密文密码去对比 
-- 用户信息脱敏，隐藏敏感信息，防止数据库中的字段泄露 
-- 我们要记录用户的登录态（session），将其存到服务器上（用后端 SpringBoot 框架封装的服务器 tomcat 去记录）cookie 
-- 返回脱敏后的用户信息
-
 ## 控制层 Controller 封装请求
 
 控制器注解：
@@ -137,11 +105,6 @@ day4：
 ```
 @RestController 适用于编写 restful 风格的 api，返回值默认为 json 类型
 ```
-
-校验写在哪里？
-
-- controller 层倾向于对请求参数本身的校验，不涉及业务逻辑本身（越少越好）
-- service 层是对业务逻辑的校验（有可能被 controller 之外的类调用）
 
 如何知道是哪个用户登录了？
 
